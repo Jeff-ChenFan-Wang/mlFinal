@@ -5,7 +5,7 @@ Promise.all([
   faceapi.nets.faceLandmark68Net.loadFromUri('/static/models'),
   faceapi.nets.faceRecognitionNet.loadFromUri('/static/models'),
   faceapi.nets.faceExpressionNet.loadFromUri('/static/models')
-]).then(startVideo)+
+]).then(startVideo)
 
 function startVideo() {
   navigator.mediaDevices.getUserMedia(
