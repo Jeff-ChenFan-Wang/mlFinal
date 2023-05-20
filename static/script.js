@@ -1,3 +1,5 @@
+const canvas = document.getElementById('videoCanvas');
+const ctx = canvas.getContext('2d');
 const video = document.getElementById('video')
 
 // Promise.all([
@@ -8,27 +10,31 @@ const video = document.getElementById('video')
 // ]).then(startVideo)
 
 function startVideo() {
-  navigator.mediaDevices.getUserMedia({ video: true })
+  navigator.mediaDevices.getUserMedia({ video: true, audio: false })
   .then(stream => video.srcObject = stream)
   .catch( err => console.error(err))
 }
 
 startVideo()
 
+video.addEventListener("play", () => {
+  setInterval(async () =>{
+    ctx.drawImage(video,0,0, canvas.width,canvas.height);
+  },1000)
+});
 
-video.addEventListener('play', () => {
-  const canvas = createCanvasFromMedia(video)
-  document.body.append(canvas)
-  const displaySize = { width: video.width, height: video.height }
-  matchDimensions(canvas, displaySize)
-
-  setInterval(async () => {
-    canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height)
-    // faceapi.draw.drawDetections(canvas, resizedDetections)
-    // faceapi.draw.drawFaceLandmarks(canvas, resizedDetections)
-    // faceapi.draw.drawFaceExpressions(canvas, resizedDetections)
-  }, 2000)
-})
+// video.addEventListener('play', () => {
+//   const videoCanvas = document.getElementById("videoCanvas");
+//   var ctx = videoCanvas.getContext('2d')
+//   videoCanvas.width = video.width
+//   videoCanvas.height = video.height
+//   console.log(videoCanvas.width)
+//   setInterval(async () => {
+//       ctx.drawImage(video, 0, 0, canvas.width,canvas.height)
+//     // canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height)
+//     // canvas.getContext('2d').rect(0,0,100,120)
+//   }, 100)
+// })
 
 
 
