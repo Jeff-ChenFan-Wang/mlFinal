@@ -2,12 +2,9 @@ const video = document.getElementById('video');
 const canvas = document.getElementById('videoCanvas');
 var ctx = canvas.getContext('2d');
 
-// Promise.all([
-//   faceapi.nets.tinyFaceDetector.loadFromUri('/static/models'),
-//   faceapi.nets.faceLandmark68Net.loadFromUri('/static/models'),
-//   faceapi.nets.faceRecognitionNet.loadFromUri('/static/models'),
-//   faceapi.nets.faceExpressionNet.loadFromUri('/static/models'),
-// ]).then(startVideo)
+var boxes = [
+  {x:10,y:10,w:50,h:50}
+];
 
 function startVideo() {
   navigator.mediaDevices.getUserMedia({ video: true, audio: false })
@@ -22,7 +19,13 @@ startVideo()
 video.addEventListener("play", () => {
   setInterval(async () =>{
     drawVideo();    
-  },250)
+  },100)
+});
+
+video.addEventListener("play",() => {
+setInterval(async () => {
+    requestBbox();
+  },1000)
 });
 
 async function drawVideo(){
@@ -33,17 +36,36 @@ async function drawVideo(){
   canvas.height = height;
 
   ctx.drawImage(video,0,0, width,height);
+  boxes.forEach(bbox =>{
+    var rectX = bbox.x;
+    var rectY = bbox.y; 
+    var rectWidth = bbox.w;
+    var rectHeight = bbox.h;
+    ctx.beginPath();
+    ctx.lineWidth = '2';
+    ctx.strokeStyle = 'red';
+    ctx.rect(rectX, rectY, rectWidth, rectHeight);
+    ctx.stroke();
+  })
+}
 
-  const rectX = width / 4; // X-coordinate of the top-left corner of the rectangle
-  const rectY = height / 4; // Y-coordinate of the top-left corner of the rectangle
-  const rectWidth = width / 2; // Width of the rectangle
-  const rectHeight = height / 2; // Height of the rectangle
-
-  ctx.beginPath();
-  ctx.lineWidth = '2';
-  ctx.strokeStyle = 'red';
-  ctx.rect(rectX, rectY, rectWidth, rectHeight);
-  ctx.stroke();
+async function requestBbox(){
+  const dataURL = canvas.toDataURL('image/png');
+  var requestedData;
+  fetch('/upload', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ image: dataURL })
+  })
+  .then(response => response.json())
+  .then(data => {
+    boxes = data.boxes
+  })
+  .catch(error => {
+    console.error(error);
+  });
 }
 
 
