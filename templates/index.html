@@ -9,22 +9,29 @@
   <script defer src="{{url_for('static',filename='face-api.min.js')}}"></script>
   <script defer src="{{url_for('static',filename='script.js')}}"></script>
   <style>
-    body {
-      margin: 0;
-      padding: 0;
-      width: 100vw;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
+    .video {
+        width: 60%;
+        height: auto;
+        visibility: hidden;
+        position: absolute;
+        top: 0;
+        left: 20%;
+      }
 
-    canvas {
-      position: absolute;
-    }
+      .canvas {
+        width: 60%;
+        height: auto;
+        position: absolute;
+        top: 0;
+        left: 20%;
+        z-index: 10;
+      }
   </style>
 </head>
 <body>
-  <video id="video" width="720" height="560" autoplay muted></video>
+    <div class="container w3-center">
+        <video class="video" id="video" autoplay muted></video>
+        <canvas class="canvas" id="videoCanvas"></canvas>
+    </div>
 </body>
 </html>
