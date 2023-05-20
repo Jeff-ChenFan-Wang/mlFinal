@@ -1,9 +1,9 @@
 from flask import Flask,render_template, request, jsonify
-import sys, pickle, cv2
-from base64 import b64decode, b64encode
+import pickle, cv2
+from base64 import b64decode
 import numpy as np
 from keras_vggface.vggface import VGGFace 
-import tensorflow as tf
+from tensorflow import image as tfImage
 
 app = Flask(__name__)
 
@@ -95,7 +95,7 @@ def extractFaces(results,origImg):
     for res in results:
         x1,y1,width,height = res
         xDelta = int(width*0.15)
-        yDelta = int(height*0.2)
+        yDelta = int(height*0.25)
         x1 = max(1,x1-xDelta)
         y1 = max(1,y1-yDelta)
         
@@ -104,7 +104,7 @@ def extractFaces(results,origImg):
 
         outLs.append(
             np.expand_dims(np.array(
-                tf.image.resize_with_pad(
+                tfImage.resize_with_pad(
                     origImg[
                         y1:y1+height,
                         x1:x1+width,

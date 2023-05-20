@@ -3,11 +3,18 @@ const canvas = document.getElementById('videoCanvas');
 var ctx = canvas.getContext('2d');
 
 var boxes = [
-  {x:10,y:10,w:50,h:50,p:0.0}
+  {x:10,y:10,w:50,h:50,p:2}
 ]; //placeholder to make sure canvas didn't die
 
 function startVideo() {
-  navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+  navigator.mediaDevices.getUserMedia({ 
+    video: {
+      mandatory: {
+        maxHeight: 240,
+        maxWidth: 427
+      }
+    }, audio: false 
+  })
   .then(stream => {
     video.srcObject = stream;
   })
@@ -25,7 +32,7 @@ video.addEventListener("play", () => {
 video.addEventListener("play",() => {
 setInterval(async () => {
     requestBbox();
-  },1500)
+  },2000)
 });
 
 async function drawVideo(){ //every 150 ms
@@ -50,9 +57,9 @@ async function drawVideo(){ //every 150 ms
     ctx.font = "bold 18px serif";
     ctx.fillStyle = "#ff0000";
     ctx.fillText(
-      bbox.p, 
-      rectX+Math.floor(rectWidth*0.1),
-      rectY+Math.floor(rectHeight*0.1)
+      bbox.p-2, 
+      rectX+Math.floor(rectWidth*0.2),
+      rectY+Math.floor(rectHeight*0.2)
     );
   })
 }
