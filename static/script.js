@@ -1,6 +1,6 @@
+const video = document.getElementById('video');
 const canvas = document.getElementById('videoCanvas');
-const ctx = canvas.getContext('2d');
-const video = document.getElementById('video')
+var ctx = canvas.getContext('2d');
 
 // Promise.all([
 //   faceapi.nets.tinyFaceDetector.loadFromUri('/static/models'),
@@ -11,7 +11,9 @@ const video = document.getElementById('video')
 
 function startVideo() {
   navigator.mediaDevices.getUserMedia({ video: true, audio: false })
-  .then(stream => video.srcObject = stream)
+  .then(stream => {
+    video.srcObject = stream;
+  })
   .catch( err => console.error(err))
 }
 
@@ -19,22 +21,31 @@ startVideo()
 
 video.addEventListener("play", () => {
   setInterval(async () =>{
-    ctx.drawImage(video,0,0, canvas.width,canvas.height);
-  },1000)
+    drawVideo();    
+  },250)
 });
 
-// video.addEventListener('play', () => {
-//   const videoCanvas = document.getElementById("videoCanvas");
-//   var ctx = videoCanvas.getContext('2d')
-//   videoCanvas.width = video.width
-//   videoCanvas.height = video.height
-//   console.log(videoCanvas.width)
-//   setInterval(async () => {
-//       ctx.drawImage(video, 0, 0, canvas.width,canvas.height)
-//     // canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height)
-//     // canvas.getContext('2d').rect(0,0,100,120)
-//   }, 100)
-// })
+async function drawVideo(){
+  const width = video.videoWidth;
+  const height = video.videoHeight;
+
+  canvas.width = width;
+  canvas.height = height;
+
+  ctx.drawImage(video,0,0, width,height);
+
+  const rectX = width / 4; // X-coordinate of the top-left corner of the rectangle
+  const rectY = height / 4; // Y-coordinate of the top-left corner of the rectangle
+  const rectWidth = width / 2; // Width of the rectangle
+  const rectHeight = height / 2; // Height of the rectangle
+
+  ctx.beginPath();
+  ctx.lineWidth = '2';
+  ctx.strokeStyle = 'red';
+  ctx.rect(rectX, rectY, rectWidth, rectHeight);
+  ctx.stroke();
+}
+
 
 
 
