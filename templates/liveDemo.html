@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Jeff Wang LiveBMI</title>
+    <script defer src="{{url_for('static',filename='script.js')}}"></script>
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+      body {font-family: "Lato", sans-serif}
+      .mySlides {display: none}
+
+      .container {
+        margin: 0 auto;
+        position: relative;
+      }
+      
+      .video {
+        width: 60%;
+        height: auto;
+        position: absolute;
+        top: 0;
+        left: 0;
+      }
+
+      .canvas {
+        width: 60%;
+        height: auto;
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 10;
+      }
+    </style>
+  
+  </head>
+
+  <body>
+    <div class="w3-top">
+        <div class="w3-bar w3-black w3-card">
+            <a href="#" class="w3-bar-item w3-button w3-padding-large">About</a>
+            <a href="live" class="w3-bar-item w3-button w3-padding-large">Live Demo</a>
+        </div>
+    </div>
+    <div class="w3-container w3-content w3-center w3-padding-64" style="max-width:800px" id="band">
+      <h2 class="w3-wide">Live Demo</h2>
+    </div>
+
+    <div class="container">
+      <video class="video" id="video" autoplay muted></video>
+      <canvas class="canvas" id="videoCanvas"></canvas>
+    </div>
+
+    <!-- <div class="w3-container w3-content w3-center w3-padding-64" style="max-width:800px" id="band">
+      <h4 class="w3-wide w3-center">Unaltered Webcam Stream</h4>
+      <p class="w3-opacity w3-center">
+        Troubleshoot your camera here.<br>
+        Hint: Try changing the lighting if the above can't find your face, <br>
+        or changing the angle if the above hallucinates faces.
+      </p>
+    </div>
+    <div>
+      
+    </div> -->
+  </body>
+</html>

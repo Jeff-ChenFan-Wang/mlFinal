@@ -3,8 +3,8 @@ const canvas = document.getElementById('videoCanvas');
 var ctx = canvas.getContext('2d');
 
 var boxes = [
-  {x:10,y:10,w:50,h:50,p:25.6}
-];
+  {x:10,y:10,w:50,h:50,p:0.0}
+]; //placeholder to make sure canvas didn't die
 
 function startVideo() {
   navigator.mediaDevices.getUserMedia({ video: true, audio: false })
@@ -25,7 +25,7 @@ video.addEventListener("play", () => {
 video.addEventListener("play",() => {
 setInterval(async () => {
     requestBbox();
-  },2000)
+  },1500)
 });
 
 async function drawVideo(){ //every 150 ms

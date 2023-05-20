@@ -15,8 +15,13 @@ vggFeatures = VGGFace(
 ridgeReg = pickle.load(open('static/ridgeReg.pkl', 'rb'))
 
 @app.route("/")
-def hellow_world():
+@app.route("/home")
+def visitHome():
     return render_template('index.html')
+
+@app.route("/live")
+def liveDemo():
+    return render_template('liveDemo.html')
 
 @app.route('/upload', methods=['POST'])
 def requestPredictions():
@@ -34,7 +39,6 @@ def requestPredictions():
         ).tolist()      
         
         bboxOutLs = packageBbox(faces,bmiPreds)
-        print(bboxOutLs)
         return jsonify({'boxes':bboxOutLs})
     else:
         return jsonify({'boxes':[]})
@@ -113,4 +117,4 @@ def extractFaces(results,origImg):
     return outLs
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=False)

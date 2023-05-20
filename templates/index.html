@@ -4,33 +4,133 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
-    <script defer src="{{url_for('static',filename='script.js')}}"></script>
+    <title>Jeff Wang LiveBMI</title>
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <style>
-      body {
-        margin: 0;
-        padding: 0;
-        width: 100vw;
-        height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
-
-      canvas {
-        position: absolute;
-      }
+      body {font-family: "Lato", sans-serif}
+      .mySlides {display: none}
     </style>
+  
   </head>
+
   <body>
-    <div>
-      <h1>Test</h1>
+    <div class="w3-top">
+        <div class="w3-bar w3-black w3-card">
+            <a href="#" class="w3-bar-item w3-button w3-padding-large">About</a>
+            <a href="live" class="w3-bar-item w3-button w3-padding-large">Live Demo</a>
+        </div>
     </div>
-    <div>
-      <video id="video" autoplay muted></video>
+
+    <div class="w3-container w3-content w3-center w3-padding-64" style="max-width:800px" id="band">
+        <h2 class="w3-wide">Live BMI</h2>
+        <p class="w3-opacity"><i>Welcome to Jeff's Live BMI demo!</i></p>
+        <p>
+            This project is meant to replicate the results of 
+            <a href="https://arxiv.org/abs/1703.03156">Face-to-BMI: Using Computer Vision to Infer Body Mass Index on Social Media</a> (Kocabey et al. 2017). 
+        </p>
+        <p>&nbsp;</p>
+
+        <h4 class="w3-wide w3-center">Web App Architecture</h4>
+        <p>
+            Frontend webcam streaming is done locally on the client side via javascript. 
+            This makes the app much more responsive and self contained,
+            instead of needing to mess with STUN servers and having WebRTC bog down our backend. 
+            Backend is supported by Flask and Gunicorn deployed on a GCP Compute Engine instance. 
+        </p>
+        <p> 
+            &nbsp;
+        </p>
+
+        <h4 class="w3-wide w3-center">Backend Model</h4>
+        <p>
+            The model uses Haar Frontal Face Cascade Classifier to recognize multiple faces in the webcam. 
+            The recognized faces are then extracted for BMI prediction. 
+        </p>
+
+        <p>
+            A Resnet-50 model trained on the <a href="https://www.robots.ox.ac.uk/~vgg/data/vgg_face/">VGG-Face</a> (Parkhi et al. 2015) 
+            dataset for facial recognition is used to extract face embeddings from the faces recognized. The embeddings are then used for BMI prediction. 
+            The original paper then fed the embeddings through an epsilon support vector regression model to predict subject BMI. 
+            In our case, I wanted to put a personal spin for fun so I also tried ridge regression instead. 
+            We still achieved similar results as seen below:
+        </p>
+        <p>&nbsp;</p>
+        <h4 class="w3-wide w3-center">Test Results</h4>
+        <p class="w3-opacity w3-center">
+            Paper used Pearson r correlations on the test set for evaluation
+        </p>
+        <table class="w3-table w3-border w3-white">
+            <tr >
+                <th>Model</th>
+                <th>Male</th>
+                <th>Female</th>
+                <th>Overall</th>
+            </tr>
+            <tr>
+                <td>VGG-Face + SVR</td>
+                <td>0.71</td>
+                <td>0.57</td>
+                <td>0.65</td>
+            </tr>
+            <tr>
+                <td>VGG-Face + L2 Regression</td>
+                <td>0.72</td>
+                <td>0.55</td>
+                <td>0.64</td>
+            </tr>
+        </table>
+        <p>&nbsp;</p>
+        <p class="w3-opacity w3-center">
+            Comparing Mean Squared Errors
+        </p>
+        <table class="w3-table w3-border w3-white">
+            <tr >
+                <th>Model</th>
+                <th>Male</th>
+                <th>Female</th>
+                <th>Overall</th>
+            </tr>
+            <tr>
+                <td>Trivial Predictor (Mean BMI)</td>
+                <td>80.51</td>
+                <td>90.10</td>
+                <td>84.89</td>
+            </tr>
+            <tr>
+                <td>VGG-Face + SVR</td>
+                <td>PLACE</td>
+                <td>PLACE</td>
+                <td>PLACE</td>
+            </tr>
+            <tr>
+                <td>VGG-Face + L2 Regression</td>
+                <td>50.28</td>
+                <td>57.86</td>
+                <td>53.55</td>
+            </tr>
+        </table>
+        <p> 
+            &nbsp;
+        </p>
+
+        <h3 class="w3-wide w3-center">Disclaimer</h3>
+        <p>
+            This is mostly for fun to test model building and deployment 
+            capabilities. The author of the paper themselves say that any machine learning prediction method of
+            individual characteristics may work “better than random guessing”, but would
+            still only be useful for studying the general population and would be wildly
+            inaccurate for any individual. 
+        </p>
+
     </div>
-    <div>
-      <canvas id="videoCanvas"></canvas>
-    </div>
+    <footer class="w3-container w3-padding-64 w3-center w3-opacity w3-light-grey w3-xlarge">
+        <p class="w3-medium">
+            CSS template courtesy of <a href="https://www.w3schools.com/w3css/w3css_templates.asp">W3Schools</a>
+            <br>
+            so I can center a div without losing my mind
+        </p>
+    </footer>
   </body>
 </html>
