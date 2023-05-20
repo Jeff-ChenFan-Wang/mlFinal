@@ -34,7 +34,8 @@
 
         <h4 class="w3-wide w3-center">Web App Architecture</h4>
         <p>
-            Frontend webcam streaming is done locally on the client side via javascript. 
+            Frontend webcam streaming is done locally on the client side via javascript,
+            then sending snapshots at timed intervals to the server. 
             This makes the app much more responsive and self contained,
             instead of needing to mess with STUN servers and having WebRTC bog down our backend (loading 
             tensorflow models is already reaching 800MiB with just one worker, so I'm trying to shave off anything
@@ -48,8 +49,8 @@
 
         <h4 class="w3-wide w3-center">Backend Model</h4>
         <p>
-            The model uses Haar Frontal Face Cascade Classifier to for multiple face detection through the webcam. 
-            The face detector used the default 1.1 scaling, but had min-neighbors tuned down to 2 for more generous detection.
+            The model uses Haar Frontal Face Cascade Classifier for multiple face detection through the webcam. 
+            The face detector uses the default 1.1 scaling, but with min-neighbors tuned down to 2 for more generous detection.
             The recognized faces are then extracted for BMI prediction. The bounding boxes are expanded
             slightly as the default  bounding boxes were found to be too tight and
             was impacting the prediction slightly.
@@ -59,7 +60,11 @@
             A Resnet-50 model trained on the <a href="https://www.robots.ox.ac.uk/~vgg/data/vgg_face/">VGG-Face</a> (Parkhi et al. 2015) 
             dataset for facial recognition is used to extract face embeddings from the faces recognized. The embeddings are then used for BMI prediction. 
             The original paper then fed the embeddings through an epsilon support vector regression model to predict subject BMI. 
-            In our case, I wanted to put a personal spin for fun so I also tried ridge regression instead. 
+            In our case, I wanted to put a personal spin for fun so I am using ridge regression instead for the final predictions. 
+
+            <br><br>Ridge performed much better than Lasso and Elasticnet. This is likely because a lot of features may be noisy and contribute little to the final accuracy, 
+            but completely zeroing most of them out erases a lot of information. Therefore, L2 regularization was much more desirable than
+            L1 as it tapers noisy features towards zero but not completely to zero. 
         </p>
         <p>&nbsp;</p>
         <h4 class="w3-wide w3-center">Test Results</h4>
@@ -94,9 +99,9 @@
         
 
         <p>
-            The new approach outperforms the trivial predictor by
-            36.9% and eeked out a tiny bit in overall MSE compared to the 
-            original approach in the paper.
+            Both approaches outperform the trivial predictor by
+            around 37% overall. The regression approach eeked over the 
+            original approach in the paper a tiny bit in overall MSE.
         </p>
         <p class="w3-opacity w3-center">
             Comparing Mean Squared Errors

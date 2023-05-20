@@ -26,7 +26,7 @@ startVideo()
 video.addEventListener("play", () => {
   setInterval(async () =>{
     drawVideo();    
-  },150)
+  },100)
 });
 
 video.addEventListener("play",() => {
