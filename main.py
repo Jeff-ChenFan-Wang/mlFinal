@@ -15,7 +15,7 @@ vggFeatures = VGGFace(
 ridgeReg = pickle.load(open('static/ridgeReg.pkl', 'rb'))
 
 @app.route("/")
-@app.route("/home")
+@app.route("/about")
 def visitHome():
     return render_template('index.html')
 

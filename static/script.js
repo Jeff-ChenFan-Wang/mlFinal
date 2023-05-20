@@ -59,7 +59,6 @@ async function drawVideo(){ //every 150 ms
 
 async function requestBbox(){ //every 2 sec
   const dataURL = canvas.toDataURL('image/png');
-  var requestedData;
   fetch('/upload', {
     method: 'POST',
     headers: {
