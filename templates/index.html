@@ -5,9 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
-    <!-- <script defer src="{{url_for('static',filename='face-api.min.js')}}"></script> -->
     <script defer src="{{url_for('static',filename='script.js')}}"></script>
-    <!-- <style>
+    <style>
       body {
         margin: 0;
         padding: 0;
@@ -21,14 +20,17 @@
       canvas {
         position: absolute;
       }
-    </style> -->
+    </style>
   </head>
   <body>
     <div>
       <h1>Test</h1>
     </div>
     <div>
-      <canvas id="videoCanvas"></canvas><video id="video" autoplay muted></video>
+      <video id="video" autoplay muted></video>
+    </div>
+    <div>
+      <canvas id="videoCanvas"></canvas>
     </div>
   </body>
 </html>

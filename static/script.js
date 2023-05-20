@@ -3,7 +3,7 @@ const canvas = document.getElementById('videoCanvas');
 var ctx = canvas.getContext('2d');
 
 var boxes = [
-  {x:10,y:10,w:50,h:50}
+  {x:10,y:10,w:50,h:50,p:25.6}
 ];
 
 function startVideo() {
@@ -19,16 +19,16 @@ startVideo()
 video.addEventListener("play", () => {
   setInterval(async () =>{
     drawVideo();    
-  },100)
+  },150)
 });
 
 video.addEventListener("play",() => {
 setInterval(async () => {
     requestBbox();
-  },1000)
+  },2000)
 });
 
-async function drawVideo(){
+async function drawVideo(){ //every 150 ms
   const width = video.videoWidth;
   const height = video.videoHeight;
 
@@ -46,10 +46,18 @@ async function drawVideo(){
     ctx.strokeStyle = 'red';
     ctx.rect(rectX, rectY, rectWidth, rectHeight);
     ctx.stroke();
+
+    ctx.font = "bold 18px serif";
+    ctx.fillStyle = "#ff0000";
+    ctx.fillText(
+      bbox.p, 
+      rectX+Math.floor(rectWidth*0.1),
+      rectY+Math.floor(rectHeight*0.1)
+    );
   })
 }
 
-async function requestBbox(){
+async function requestBbox(){ //every 2 sec
   const dataURL = canvas.toDataURL('image/png');
   var requestedData;
   fetch('/upload', {
@@ -67,9 +75,3 @@ async function requestBbox(){
     console.error(error);
   });
 }
-
-
-
-
-
-
