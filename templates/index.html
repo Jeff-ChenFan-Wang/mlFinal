@@ -34,49 +34,61 @@
 
         <h4 class="w3-wide w3-center">Web App Architecture</h4>
         <p>
-            Frontend webcam streaming and face detection is done locally on the client side via javascript,
+            Webcam streaming and face detection is done locally on the client side via javascript,
             then sending results at timed intervals to the server for BMI prediction. 
             This makes the app much more responsive and self contained,
             instead of having to mess with STUN servers and WebRTC. 
-            It also takes a good chunk of loading off of our backend. Since loading 
+            It also takes a chunk of load off of our backend. Since loading 
             tensorflow is already reaching 800MiB with just one worker, I'm trying to shave off anything
             I can.
-            <br><br> The Backend is supported by Flask and Gunicorn, and the webapp is deployed on a 
-            GCP Compute Engine instance via GAE.
+            <br><br> The Backend is supported by Flask and Gunicorn,
+            which serves the Tensorflow model to make predictions.
+            Lastly, the webapp is deployed on GCP via GAE.
         </p>
         <p> 
             &nbsp;
         </p>
 
-        <h4 class="w3-wide w3-center">Backend Model</h4>
+        <h4 class="w3-wide w3-center">The Model</h4>
         <p>
-            The model uses <a href="https://arxiv.org/abs/1612.04402">Tiny Face Detector</a> for multiple face detection through the webcam, and the recognized faces are then extracted for BMI prediction. The bounding boxes are expanded
-            slightly as the default  bounding boxes were found to be too tight and
-            was impacting the prediction slightly.
+            The model uses <a href="https://arxiv.org/abs/1612.04402">Tiny Face Detector</a> 
+            for client-side face detection through the webcam, and the recognized faces are then extracted for BMI prediction.
+            The bounding boxes are expanded slightly as the default  bounding boxes were found to be too tight and
+            was slighyly negatively impacting the predictions.
         </p>
 
         <p>
             A Resnet-50 model trained on the <a href="https://www.robots.ox.ac.uk/~vgg/data/vgg_face/">VGG-Face</a> (Parkhi et al. 2015) 
             dataset for facial recognition is used to extract face embeddings from the faces recognized. The embeddings are then used for BMI prediction. 
-            The original paper then fed the embeddings through an epsilon support vector regression model to predict subject BMI. 
-            In our case, I wanted to put a personal spin for fun so I am using ridge regression instead for the final predictions. 
+            The original paper then fed faces from the <a href="http://www.visualbmi.com/">VisualBMI Dataset</a>
+            to generate embeddings, which is then used by an epsilon support vector regression model for supervised learning on said dataset.
 
+
+            <br><br>In our case, I wanted to put a personal spin for fun so I am using ridge regression instead for the final predictions. 
+            Before being fed into the regression, the embeddings are nudged and log transformed.
+            Additional feature engineering was attempted such clustering embeddings then feeding resulting 
+            labels to the regression, but none were found to significantly 
+            improve the predictions during cross-validation. Other methods such as tree regression were attempted (Xgboost, Random Forest) 
+            but also did not perform as well. 
             <br><br>
             Ridge performed much better than Lasso and Elasticnet. This is likely because a lot of features may not contribute 
             much to the most samples, but become extremely valuable in a few specific cases.  Completely zeroing most of 
             them out with L1 would therefore erase a lot of information. Hence, L2 regularization was much more desirable than
             L1 as it tapers noisy features towards zero but not completely to zero, allowing the normally noisy features to 
             still contribute to some degree when they should.
+
+            <br><br>
+
         </p>
         <p>&nbsp;</p>
         <h4 class="w3-wide w3-center">Test Results</h4>
         <p>
-            As seen below, this approach achieved similar overall performance
-            and outperformed the original approach for predicting the BMI of males very slightly, though it
-            sacrificed some performance on predicting female BMI.
+            As seen below, this approach achieved similar overall performance. 
+            The regression approach, however, was much more consistant across
+            male and females compared to the SVM approach.
         </p>
         <p class="w3-opacity w3-center">
-            Paper used Pearson r correlations on the test set for evaluation
+            Original paper used Pearson r correlations on for evaluation
         </p>
         <table class="w3-table w3-border w3-white">
             <tr >
@@ -93,8 +105,8 @@
             </tr>
             <tr>
                 <td>VGG-Face + L2 Regression</td>
-                <td>0.72</td>
-                <td>0.55</td>
+                <td>0.65</td>
+                <td>0.64</td>
                 <td>0.65</td>
             </tr>
         </table>
@@ -102,8 +114,8 @@
 
         <p>
             Both approaches outperform the trivial predictor by
-            around 37% overall. The regression approach eeked over the 
-            original approach in the paper a tiny bit in overall MSE.
+            around 39% in overall MSE. The regression approach eeked over the 
+            SVM approach in the paper a tiny bit in overall MSE as well.
         </p>
         <p class="w3-opacity w3-center">
             Comparing Mean Squared Errors
@@ -123,15 +135,15 @@
             </tr>
             <tr>
                 <td>VGG-Face + SVR</td>
-                <td>52.36</td>
-                <td>53.66</td>
-                <td>54.12</td>
+                <td>45.36</td>
+                <td>65.63</td>
+                <td>52.12</td>
             </tr>
             <tr>
                 <td>VGG-Face + L2 Regression</td>
-                <td>50.28</td>
-                <td>57.86</td>
-                <td>53.55</td>
+                <td>49.17</td>
+                <td>55.22</td>
+                <td>51.78</td>
             </tr>
         </table>
         <p> 
