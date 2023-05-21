@@ -34,12 +34,13 @@
 
         <h4 class="w3-wide w3-center">Web App Architecture</h4>
         <p>
-            Frontend webcam streaming is done locally on the client side via javascript,
-            then sending snapshots at timed intervals to the server. 
+            Frontend webcam streaming and face detection is done locally on the client side via javascript,
+            then sending results at timed intervals to the server for BMI prediction. 
             This makes the app much more responsive and self contained,
-            instead of needing to mess with STUN servers and having WebRTC bog down our backend (loading 
-            tensorflow models is already reaching 800MiB with just one worker, so I'm trying to shave off anything
-            I can).
+            instead of having to mess with STUN servers and WebRTC. 
+            It also takes a good chunk of loading off of our backend. Since loading 
+            tensorflow is already reaching 800MiB with just one worker, I'm trying to shave off anything
+            I can.
             <br><br> The Backend is supported by Flask and Gunicorn, and the webapp is deployed on a 
             GCP Compute Engine instance via GAE.
         </p>
@@ -49,9 +50,7 @@
 
         <h4 class="w3-wide w3-center">Backend Model</h4>
         <p>
-            The model uses Haar Frontal Face Cascade Classifier for multiple face detection through the webcam. 
-            The face detector uses the default 1.1 scaling, but with min-neighbors tuned down to 2 for more generous detection.
-            The recognized faces are then extracted for BMI prediction. The bounding boxes are expanded
+            The model uses <a href="https://arxiv.org/abs/1612.04402">Tiny Face Detector</a> for multiple face detection through the webcam, and the recognized faces are then extracted for BMI prediction. The bounding boxes are expanded
             slightly as the default  bounding boxes were found to be too tight and
             was impacting the prediction slightly.
         </p>
@@ -62,16 +61,19 @@
             The original paper then fed the embeddings through an epsilon support vector regression model to predict subject BMI. 
             In our case, I wanted to put a personal spin for fun so I am using ridge regression instead for the final predictions. 
 
-            <br><br>Ridge performed much better than Lasso and Elasticnet. This is likely because a lot of features may be noisy and contribute little to the final accuracy, 
-            but completely zeroing most of them out erases a lot of information. Therefore, L2 regularization was much more desirable than
-            L1 as it tapers noisy features towards zero but not completely to zero. 
+            <br><br>
+            Ridge performed much better than Lasso and Elasticnet. This is likely because a lot of features may not contribute 
+            much to the most samples, but become extremely valuable in a few specific cases.  Completely zeroing most of 
+            them out with L1 would therefore erase a lot of information. Hence, L2 regularization was much more desirable than
+            L1 as it tapers noisy features towards zero but not completely to zero, allowing the normally noisy features to 
+            still contribute to some degree when they should.
         </p>
         <p>&nbsp;</p>
         <h4 class="w3-wide w3-center">Test Results</h4>
         <p>
             As seen below, this approach achieved similar overall performance
-            and outperformed the original approach for predicting the BMI of males very slightly, though
-            sacrificing some performance on predicting female BMI.
+            and outperformed the original approach for predicting the BMI of males very slightly, though it
+            sacrificed some performance on predicting female BMI.
         </p>
         <p class="w3-opacity w3-center">
             Paper used Pearson r correlations on the test set for evaluation

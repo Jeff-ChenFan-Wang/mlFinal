@@ -32,11 +32,11 @@ def addPredToBox():
     
     if len(faces)>0: #redundant but just to be safe
         faceCutouts = extractFaces(faces,img)
-        bmiPreds = (ridgeReg.predict(
-            vggFeatures.predict(
+        bmiPreds = ridgeReg.predict(
+            np.log(vggFeatures.predict(
                 np.vstack(faceCutouts)
-            )  
-        )-2).tolist()
+            )+0.1)
+        ).tolist()
         boxesAndPreds = packageBbox(faces,bmiPreds)
     return jsonify({'boxes':boxesAndPreds})   
 

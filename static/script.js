@@ -87,7 +87,7 @@ function getBboxes(detections){
   let bboxes = detections.map(det_result => {
     var bbox = det_result._box
     return {
-      x: bbox._x, 
+      x: bbox._x,
       y: bbox._y,
       w: bbox._width,
       h: bbox._height
