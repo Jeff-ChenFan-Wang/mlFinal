@@ -1,5 +1,6 @@
 from flask import Flask,render_template, request, jsonify
-import pickle, cv2
+import pickle, sys
+from cv2 import imdecode as cv2Imdecode
 from base64 import b64decode
 import numpy as np
 from keras_vggface.vggface import VGGFace 
@@ -7,7 +8,6 @@ from tensorflow import image as tfImage
 
 app = Flask(__name__)
 
-face_cascade = cv2.CascadeClassifier('static/haarcascade_frontalface_default.xml')
 vggFeatures = VGGFace(
     model='resnet50', include_top=False, 
     input_shape=(224, 224, 3), 
@@ -24,25 +24,21 @@ def liveDemo():
     return render_template('liveDemo.html')
 
 @app.route('/upload', methods=['POST'])
-def requestPredictions():
-    # Get the data URL from the request body
+def addPredToBox():
     data = request.json
-    img = js2Img(data['image'])
     
-    faces = face_cascade.detectMultiScale(img, minNeighbors=2)
-    if len(faces)>0:
+    img = js2Img(data['image'])
+    faces = data['boxes']
+    
+    if len(faces)>0: #redundant but just to be safe
         faceCutouts = extractFaces(faces,img)
-        bmiPreds = ridgeReg.predict(
+        bmiPreds = (ridgeReg.predict(
             vggFeatures.predict(
                 np.vstack(faceCutouts)
             )  
-        ).tolist()      
-        
-        bboxOutLs = packageBbox(faces,bmiPreds)
-        return jsonify({'boxes':bboxOutLs})
-    else:
-        return jsonify({'boxes':[]})
-    
+        )-2).tolist()
+        boxesAndPreds = packageBbox(faces,bmiPreds)
+    return jsonify({'boxes':boxesAndPreds})   
 
 def js2Img(js_reply):
   """
@@ -53,24 +49,14 @@ def js2Img(js_reply):
   """
   image_bytes = b64decode(js_reply.split(',')[1])
   jpg_as_np = np.frombuffer(image_bytes, dtype=np.uint8)
-  img = cv2.imdecode(jpg_as_np, flags=1)
+  img = cv2Imdecode(jpg_as_np, flags=1)
 
   return img
 
-def packageBbox(cascadeResults, bmiPreds):
-    bboxOutLs = []
-    for i in range(len(cascadeResults)):
-        x,y,w,h = cascadeResults[i]
-        pred = bmiPreds[i]
-        
-        bboxOutLs.append({
-            'x':int(x),
-            'y':int(y),
-            'w':int(w),
-            'h':int(h),
-            'p':round(pred,2)
-        })
-    return bboxOutLs
+def packageBbox(faces, bmiPreds):
+    for i in range(len(faces)):
+        faces[i]['p'] = round(bmiPreds[i],2)
+    return faces
 
 def extractFaces(results,origImg):
     """create cutouts using bboxes, expanding bbox
@@ -79,7 +65,7 @@ def extractFaces(results,origImg):
 
     Parameters
     ----------
-    results : list
+    results : list(dict)
         list of bounding boxes
     origImg : whatever tf cv2 returns
         original PIL image read by cv2
@@ -93,9 +79,12 @@ def extractFaces(results,origImg):
     """
     outLs = []
     for res in results:
-        x1,y1,width,height = res
-        xDelta = int(width*0.15)
-        yDelta = int(height*0.25)
+        x1 = int(res['x'])
+        y1 = int(res['y'])
+        width = int(res['w'])
+        height = int(res['h'])
+        xDelta = int(width*0.1)
+        yDelta = int(height*0.15)
         x1 = max(1,x1-xDelta)
         y1 = max(1,y1-yDelta)
         
