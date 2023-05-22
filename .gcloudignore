@@ -2,3 +2,4 @@
 /mlVenv/
 .git
 .gitignore
+modelBuilding.ipynb
